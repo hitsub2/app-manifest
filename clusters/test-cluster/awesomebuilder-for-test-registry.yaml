@@ -1,0 +1,10 @@
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta1
+kind: ImageRepository
+metadata:
+  name: awesomebuilder-for-test
+  namespace: flux-system
+spec:
+  image: 724853865853.dkr.ecr.us-east-1.amazonaws.com/awesomebuilder-for-test
+  interval: 1m0s
+

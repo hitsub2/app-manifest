@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dongdgy
+  namespace: dongdgy
+  annotations:
+    flux.weave.works/automated: "true"
+spec:
+  selector:
+    matchLabels:
+      app: dongdgy
+  replicas: 7
+  template:
+    metadata:
+      labels:
+        app: dongdgy
+    spec:
+      containers:
+      - name: dongdgy
+        image: 724853865853.dkr.ecr.us-east-1.amazonaws.com/apiservices:1.0.19 # {"$imagepolicy": "flux-system:apiservices-dongdgy"}
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: dongdgy
+  name: dongdgy
+  namespace: dongdgy
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: dongdgy
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dongdgy
+  namespace: dongdgy
+  labels:
+    app: dongdgy
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+spec:
+  ingressClassName: alb
+  rules:
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: dongdgy
+            port:
+              number: 80

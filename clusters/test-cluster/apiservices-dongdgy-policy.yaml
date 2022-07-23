@@ -1,0 +1,13 @@
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta1
+kind: ImagePolicy
+metadata:
+  name: apiservices-dongdgy
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: apiservices-dongdgy
+  policy:
+    semver:
+      range: 1.0.x
+

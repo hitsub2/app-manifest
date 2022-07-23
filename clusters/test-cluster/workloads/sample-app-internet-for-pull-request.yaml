@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pull-request
+  namespace: pull-request
+  annotations:
+    flux.weave.works/automated: "true"
+spec:
+  selector:
+    matchLabels:
+      app: pull-request
+  replicas: 7
+  template:
+    metadata:
+      labels:
+        app: pull-request
+    spec:
+      containers:
+      - name: pull-request
+        image: 724853865853.dkr.ecr.us-east-1.amazonaws.com/apiservices:1.0.19 # {"$imagepolicy": "flux-system:apiservices"}
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: pull-request
+  name: pull-request
+  namespace: pull-request
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: pull-request
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pull-request
+  namespace: pull-request
+  labels:
+    app: pull-request
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+spec:
+  ingressClassName: alb
+  rules:
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: pull-request
+            port:
+              number: 80
